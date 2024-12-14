@@ -1,0 +1,5 @@
+fastapi[standard]
+sqlalchemy
+pyjwt
+docker
+websockets 
