@@ -53,10 +53,14 @@ class TokenResponse(BaseModel):
 
 # Protected route - Requires a valid JWT token
 @auth_router.get("/", response_model=TokenResponse)
-async def root(token: str = Depends(oauth2_scheme)):
+async def root(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     payload = verify_token(token)
     print(payload)
     if payload is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
-    print(payload)
+    user = payload.get('sub')
+    user = get_user_by_email(db, user)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+
     return {"message": "Hello World", "token_payload": payload}
